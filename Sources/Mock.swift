@@ -158,17 +158,6 @@ public struct Mock: Equatable {
 
         self.fileExtensions = fileExtensions?.map({ $0.replacingOccurrences(of: ".", with: "") })
     }
-
-    /// Creates a `Mock` for the given data type. The mock will be automatically matched based on a URL created from the given parameters.
-    ///
-    /// - Parameters:
-    ///   - dataType: The type of the data which is returned.
-    ///   - statusCode: The HTTP status code to return with the response.
-    ///   - data: The data which will be returned as the response based on the HTTP Method.
-    ///   - additionalHeaders: Additional headers to be added to the response.
-    public init(dataType: String, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:]) {
-        self.init(url: nil, dataType: dataType, statusCode: statusCode, data: data, additionalHeaders: additionalHeaders, fileExtensions: nil)
-    }
     
     /// Creates a `Mock` for the given data type. The mock will be automatically matched based on a URL created from the given parameters.
     ///
@@ -193,6 +182,21 @@ public struct Mock: Equatable {
     ///   - data: The data which will be returned as the response based on the HTTP Method.
     ///   - additionalHeaders: Additional headers to be added to the response.
     public init(url: URL, ignoreQuery: Bool = false, cacheStoragePolicy: URLCache.StoragePolicy = .notAllowed, dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
+        self.init(url: url, ignoreQuery: ignoreQuery, cacheStoragePolicy: cacheStoragePolicy, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
+    }
+
+    /// Creates a `Mock` for the given URL.
+    ///
+    /// - Parameters:
+    ///   - url: The URL to match for and to return the mocked data for.
+    ///   - ignoreQuery: If `true`, checking the URL will ignore the query and match only for the scheme, host and path. Defaults to `false`.
+    ///   - cacheStoragePolicy: The caching strategy. Defaults to `notAllowed`.
+    ///   - reportFailure: if `true`, the URLsession will report an error loading the URL rather than returning data. Defaults to `false`.
+    ///   - dataType: The type of the data which is returned.
+    ///   - statusCode: The HTTP status code to return with the response.
+    ///   - data: The data which will be returned as the response based on the HTTP Method.
+    ///   - additionalHeaders: Additional headers to be added to the response.
+    public init(url: URL, ignoreQuery: Bool = false, cacheStoragePolicy: URLCache.StoragePolicy = .notAllowed, dataType: String, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
         self.init(url: url, ignoreQuery: ignoreQuery, cacheStoragePolicy: cacheStoragePolicy, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
     }
     
