@@ -36,6 +36,7 @@ public struct Mock: Equatable {
         case pdf
         case mp4
         case zip
+        case custom
         
         var headerValue: String {
             switch self {
@@ -51,6 +52,8 @@ public struct Mock: Equatable {
                 return "video/mp4"
             case .zip:
                 return "application/zip"
+            case .custom:
+                return ""
             }
         }
     }
@@ -123,6 +126,27 @@ public struct Mock: Equatable {
 
         self.fileExtensions = fileExtensions?.map({ $0.replacingOccurrences(of: ".", with: "") })
     }
+
+    private init(url: URL? = nil, ignoreQuery: Bool = false, dataType: String, statusCode: Int, data: [HTTPMethod: Data], requestError: Error? = nil, additionalHeaders: [String: String] = [:], fileExtensions: [String]? = nil) {
+        self.urlToMock = url
+        let generatedURL = URL(string: "https://mocked.wetransfer.com/\(DataType.custom.rawValue)/\(statusCode)/\(data.keys.first!.rawValue)")!
+        self.generatedURL = generatedURL
+        var request = URLRequest(url: url ?? generatedURL)
+        request.httpMethod = data.keys.first!.rawValue
+        self.request = request
+        self.ignoreQuery = ignoreQuery
+        self.requestError = requestError
+        self.dataType = .custom
+        self.statusCode = statusCode
+        self.data = data
+
+        var headers = additionalHeaders
+        headers["Content-Type"] = dataType
+        self.headers = headers
+
+        self.fileExtensions = fileExtensions?.map({ $0.replacingOccurrences(of: ".", with: "") })
+    }
+
     
     /// Creates a `Mock` for the given data type. The mock will be automatically matched based on a URL created from the given parameters.
     ///
@@ -148,7 +172,21 @@ public struct Mock: Equatable {
     public init(url: URL, ignoreQuery: Bool = false, dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
         self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
     }
-    
+
+    /// Creates a `Mock` for the given URL.
+    ///
+    /// - Parameters:
+    ///   - url: The URL to match for and to return the mocked data for.
+    ///   - ignoreQuery: If `true`, checking the URL will ignore the query and match only for the scheme, host and path. Defaults to `false`.
+    ///   - reportFailure: if `true`, the URLsession will report an error loading the URL rather than returning data. Defaults to `false`.
+    ///   - dataType: The type of the data which is returned.
+    ///   - statusCode: The HTTP status code to return with the response.
+    ///   - data: The data which will be returned as the response based on the HTTP Method.
+    ///   - additionalHeaders: Additional headers to be added to the response.
+    public init(url: URL, ignoreQuery: Bool = false, dataType: String, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
+        self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
+    }
+
     /// Creates a `Mock` for the given file extensions. The mock will only be used for urls matching the extension.
     ///
     /// - Parameters:
