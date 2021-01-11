@@ -37,6 +37,7 @@ public struct Mock: Equatable {
         case pdf
         case mp4
         case zip
+        case custom
         
         var headerValue: String {
             switch self {
@@ -52,6 +53,8 @@ public struct Mock: Equatable {
                 return "video/mp4"
             case .zip:
                 return "application/zip"
+            case .custom:
+                return ""
             }
         }
     }
@@ -65,7 +68,7 @@ public struct Mock: Equatable {
     public let requestError: Error?
 
     /// The headers to send back with the response.
-    public let headers: [String: String]
+    public var headers: [String: String]
     
     /// The HTTP status code to return with the response.
     public let statusCode: Int
@@ -133,6 +136,38 @@ public struct Mock: Equatable {
         self.headers = headers
 
         self.fileExtensions = fileExtensions?.map({ $0.replacingOccurrences(of: ".", with: "") })
+    }
+
+    private init(url: URL? = nil, ignoreQuery: Bool = false, cacheStoragePolicy: URLCache.StoragePolicy = .notAllowed, dataType: String, statusCode: Int, data: [HTTPMethod: Data], requestError: Error? = nil, additionalHeaders: [String: String] = [:], fileExtensions: [String]? = nil) {
+        self.urlToMock = url
+        let generatedURL = URL(string: "https://mocked.wetransfer.com/\(DataType.custom.rawValue)/\(statusCode)/\(data.keys.first!.rawValue)")!
+        self.generatedURL = generatedURL
+        var request = URLRequest(url: url ?? generatedURL)
+        request.httpMethod = data.keys.first!.rawValue
+        self.request = request
+        self.ignoreQuery = ignoreQuery
+        self.requestError = requestError
+        self.dataType = .custom
+        self.statusCode = statusCode
+        self.data = data
+        self.cacheStoragePolicy = cacheStoragePolicy
+
+        var headers = additionalHeaders
+        headers["Content-Type"] = dataType
+        self.headers = headers
+
+        self.fileExtensions = fileExtensions?.map({ $0.replacingOccurrences(of: ".", with: "") })
+    }
+
+    /// Creates a `Mock` for the given data type. The mock will be automatically matched based on a URL created from the given parameters.
+    ///
+    /// - Parameters:
+    ///   - dataType: The type of the data which is returned.
+    ///   - statusCode: The HTTP status code to return with the response.
+    ///   - data: The data which will be returned as the response based on the HTTP Method.
+    ///   - additionalHeaders: Additional headers to be added to the response.
+    public init(dataType: String, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:]) {
+        self.init(url: nil, dataType: dataType, statusCode: statusCode, data: data, additionalHeaders: additionalHeaders, fileExtensions: nil)
     }
     
     /// Creates a `Mock` for the given data type. The mock will be automatically matched based on a URL created from the given parameters.
