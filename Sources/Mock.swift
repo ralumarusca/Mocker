@@ -170,8 +170,8 @@ public struct Mock: Equatable {
     ///   - statusCode: The HTTP status code to return with the response.
     ///   - data: The data which will be returned as the response based on the HTTP Method.
     ///   - additionalHeaders: Additional headers to be added to the response.
-    public init(url: URL, ignoreQuery: Bool = false, dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
-        self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
+    public init(url: URL, ignoreQuery: Bool = false, dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], bodyData: Data? = nil, additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
+        self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, bodyData: bodyData, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
     }
 
     /// Creates a `Mock` for the given URL.
@@ -184,8 +184,8 @@ public struct Mock: Equatable {
     ///   - statusCode: The HTTP status code to return with the response.
     ///   - data: The data which will be returned as the response based on the HTTP Method.
     ///   - additionalHeaders: Additional headers to be added to the response.
-    public init(url: URL, ignoreQuery: Bool = false, dataType: String, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
-        self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
+    public init(url: URL, ignoreQuery: Bool = false, dataType: String, statusCode: Int, data: [HTTPMethod: Data], bodyData: Data? = nil, additionalHeaders: [String: String] = [:], requestError: Error? = nil) {
+        self.init(url: url, ignoreQuery: ignoreQuery, dataType: dataType, statusCode: statusCode, data: data, bodyData: bodyData, requestError: requestError, additionalHeaders: additionalHeaders, fileExtensions: nil)
     }
 
     /// Creates a `Mock` for the given file extensions. The mock will only be used for urls matching the extension.
@@ -196,8 +196,8 @@ public struct Mock: Equatable {
     ///   - statusCode: The HTTP status code to return with the response.
     ///   - data: The data which will be returned as the response based on the HTTP Method.
     ///   - additionalHeaders: Additional headers to be added to the response.
-    public init(fileExtensions: String..., dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], additionalHeaders: [String: String] = [:]) {
-        self.init(url: nil, dataType: dataType, statusCode: statusCode, data: data, additionalHeaders: additionalHeaders, fileExtensions: fileExtensions)
+    public init(fileExtensions: String..., dataType: DataType, statusCode: Int, data: [HTTPMethod: Data], bodyData: Data? = nil, additionalHeaders: [String: String] = [:]) {
+        self.init(url: nil, dataType: dataType, statusCode: statusCode, data: data, bodyData: bodyData, additionalHeaders: additionalHeaders, fileExtensions: fileExtensions)
     }
     
     /// Registers the mock with the shared `Mocker`.
